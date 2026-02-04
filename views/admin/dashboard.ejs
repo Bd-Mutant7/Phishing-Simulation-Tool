@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Phishing Simulation Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+        
+        .navbar {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .navbar nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: opacity 0.2s;
+        }
+        
+        .navbar nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .campaigns-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .campaigns-list h2 {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .campaign-item {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .campaign-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .campaign-item:last-child {
+            border-bottom: none;
+        }
+        
+        .campaign-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .campaign-info p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-draft {
+            background: #ecf0f1;
+            color: #7f8c8d;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-completed {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🛡️ Phishing Simulation Platform</h1>
+        <nav>
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/campaigns">Campaigns</a>
+            <a href="/admin/employees">Employees</a>
+            <a href="/admin/logout">Logout</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <h1 style="margin-bottom: 2rem;">Dashboard</h1>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Employees</h3>
+                <div class="value"><%= stats.totalEmployees %></div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Campaigns</h3>
+                <div class="value"><%= stats.activeCampaigns %></div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Campaigns</h3>
+                <div class="value"><%= campaigns.length %></div>
+            </div>
+        </div>
+
+        <div class="campaigns-list">
+            <div style="padding: 1.5rem 2rem; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">Recent Campaigns</h2>
+                <a href="/admin/campaigns/new" class="btn btn-success">+ New Campaign</a>
+            </div>
+            
+            <% if (campaigns.length === 0) { %>
+                <div class="empty-state">
+                    <p>No campaigns yet. Create your first campaign to get started.</p>
+                </div>
+            <% } else { %>
+                <% campaigns.forEach(campaign => { %>
+                    <div class="campaign-item">
+                        <div class="campaign-info">
+                            <h3><%= campaign.name %></h3>
+                            <p><%= campaign.description || 'No description' %></p>
+                        </div>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <span class="status-badge status-<%= campaign.status %>">
+                                <%= campaign.status.toUpperCase() %>
+                            </span>
+                            <a href="/admin/campaigns/<%= campaign.id %>" class="btn">View</a>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
