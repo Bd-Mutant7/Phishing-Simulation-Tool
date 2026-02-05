@@ -1,19 +1,30 @@
-// Simple function without Express
-module.exports = async (req, res) => {
-  const { url } = req;
+// api/index.js
+module.exports = (req, res) => {
+  // Get the path from the request
+  const path = req.url || '/';
   
-  if (url === '/') {
-    return res.end('Home Page');
+  // Simple routing
+  if (path === '/' || path === '') {
+    res.statusCode = 200;
+    return res.end('✅ HOME PAGE - Working!');
   }
   
-  if (url === '/test') {
-    return res.end('Test Page');
+  if (path === '/test') {
+    res.statusCode = 200;
+    return res.end('✅ TEST PAGE - Working!');
   }
   
-  if (url === '/analytics') {
-    return res.end('Analytics Page');
+  if (path === '/analytics') {
+    res.statusCode = 200;
+    return res.end('✅ ANALYTICS PAGE - Working!');
   }
   
+  if (path === '/training') {
+    res.statusCode = 200;
+    return res.end('✅ TRAINING PAGE - Working!');
+  }
+  
+  // Not found
   res.statusCode = 404;
-  res.end('Not Found: ' + url);
+  res.end('❌ Page not found: ' + path);
 };
