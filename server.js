@@ -8,23 +8,28 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Routes
 app.get('/', (req, res) => {
-  res.render('landing');  // Do you have views/landing.ejs? Or is it in simulation/landing.ejs?
+  res.render('simulation/landing');  // Fixed: views/simulation/landing.ejs
 });
 
 app.get('/analytics', (req, res) => {
-  res.render('admin/dashboard');  // Fixed path
+  res.render('admin/dashboard');  // views/admin/dashboard.ejs
 });
 
 app.get('/report', (req, res) => {
-  res.render('admin/campaigns');  // Fixed path
+  res.render('admin/campaigns');  // views/admin/campaigns.ejs
 });
 
 app.get('/training', (req, res) => {
-  res.render('training/landing');  // Correct
+  res.render('training/landing');  // views/training/landing.ejs
 });
 
 app.get('/user-settings', (req, res) => {
-  res.render('admin/employees');  // Fixed path
+  res.render('admin/employees');  // views/admin/employees.ejs
+});
+
+// Optional: Add login route if you need it
+app.get('/login', (req, res) => {
+  res.render('admin/login');  // views/admin/login.ejs
 });
 
 // Start server
