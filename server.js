@@ -1,42 +1,31 @@
 const express = require('express');
 const app = express();
 
-// Test route - should always work
+// Basic test route
 app.get('/test', (req, res) => {
-  res.send('✅ Server is working!');
+  res.send('✅ Server is working at /test');
 });
 
-// Test EJS rendering
-app.get('/test-ejs', (req, res) => {
-  res.send('EJS test - change to res.render later');
-});
-
-// Your actual routes (commented out for now)
-// app.get('/', (req, res) => {
-//   res.render('simulation/landing');
-// });
-
+// Home route
 app.get('/', (req, res) => {
-  res.send('Home page - EJS disabled for testing');
+  res.send('✅ Home page is working');
 });
 
+// Analytics route (simple for now)
 app.get('/analytics', (req, res) => {
-  res.send('Analytics page - EJS disabled for testing');
+  res.send('✅ Analytics page is working');
 });
 
+// Training route
 app.get('/training', (req, res) => {
-  res.send('Training page - EJS disabled for testing');
+  res.send('✅ Training page is working');
 });
 
 // Error handling
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).send('Error: ' + err.message);
+app.use((req, res) => {
+  res.status(404).send('❌ Page not found');
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+// Don't use app.listen() for Vercel
+// Just export the app
 module.exports = app;
