@@ -8,23 +8,23 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Routes
 app.get('/', (req, res) => {
-  res.render('landing');
+  res.render('landing');  // Do you have views/landing.ejs? Or is it in simulation/landing.ejs?
 });
 
 app.get('/analytics', (req, res) => {
-  res.render('dashboard');
+  res.render('admin/dashboard');  // Fixed path
 });
 
 app.get('/report', (req, res) => {
-  res.render('campaigns');
+  res.render('admin/campaigns');  // Fixed path
 });
 
 app.get('/training', (req, res) => {
-  res.render('training/landing');
+  res.render('training/landing');  // Correct
 });
 
 app.get('/user-settings', (req, res) => {
-  res.render('employees');
+  res.render('admin/employees');  // Fixed path
 });
 
 // Start server
