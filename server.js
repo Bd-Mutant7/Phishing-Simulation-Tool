@@ -1,31 +1,27 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 
-// Basic test route
-app.get('/test', (req, res) => {
-  res.send('✅ Server is working at /test');
-});
+// Set up EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// Home route
+// Routes with EJS
 app.get('/', (req, res) => {
-  res.send('✅ Home page is working');
+  res.render('simulation/landing');
 });
 
-// Analytics route (simple for now)
 app.get('/analytics', (req, res) => {
-  res.send('✅ Analytics page is working');
+  res.render('admin/dashboard');
 });
 
-// Training route
 app.get('/training', (req, res) => {
-  res.send('✅ Training page is working');
+  res.render('training/landing');
 });
 
-// Error handling
-app.use((req, res) => {
-  res.status(404).send('❌ Page not found');
+// Test route
+app.get('/test', (req, res) => {
+  res.send('✅ All systems working');
 });
 
-// Don't use app.listen() for Vercel
-// Just export the app
 module.exports = app;
