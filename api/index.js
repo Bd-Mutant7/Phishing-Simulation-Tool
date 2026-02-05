@@ -1,22 +1,19 @@
-const express = require('express');
-const app = express();
-
-// Routes
-app.get('/', (req, res) => {
-  res.send('HOME PAGE - Working!');
-});
-
-app.get('/analytics', (req, res) => {
-  res.send('ANALYTICS PAGE - Working!');
-});
-
-app.get('/training', (req, res) => {
-  res.send('TRAINING PAGE - Working!');
-});
-
-app.get('/test', (req, res) => {
-  res.send('✅ TEST PAGE - Everything works!');
-});
-
-// Export for Vercel serverless
-module.exports = app;
+// Simple function without Express
+module.exports = async (req, res) => {
+  const { url } = req;
+  
+  if (url === '/') {
+    return res.end('Home Page');
+  }
+  
+  if (url === '/test') {
+    return res.end('Test Page');
+  }
+  
+  if (url === '/analytics') {
+    return res.end('Analytics Page');
+  }
+  
+  res.statusCode = 404;
+  res.end('Not Found: ' + url);
+};
