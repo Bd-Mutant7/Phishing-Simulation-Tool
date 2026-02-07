@@ -1,90 +1,60 @@
-// api/render.js - FIXED VERSION
+// api/render.js - TEST EJS VERSION
 const path = require('path');
+const fs = require('fs').promises;
 
 module.exports = async (req, res) => {
+  console.log('Rendering page for:', req.url);
+  
   try {
-    console.log('Render request:', req.url);
+    // FIRST: Try to render test.ejs to verify EJS works
+    const testPath = path.join(__dirname, '../views/test.ejs');
     
-    // Map URLs to EJS files
-    let ejsFile = 'index.ejs';
-    
-    if (req.url === '/login' || req.url === '/login/') {
-      ejsFile = 'login.ejs';
-    }
-    // Add other routes as needed
-    
-    // IMPORTANT: Use correct path for Vercel
-    // In Vercel, files are in /var/task/
-    const ejsPath = path.join(process.cwd(), 'views', ejsFile);
-    console.log('Looking for EJS file at:', ejsPath);
-    
-    // Try to require EJS if available, otherwise send simple HTML
+    // Check if EJS module is available
+    let ejs;
     try {
-      const ejs = require('ejs');
-      const fs = require('fs').promises;
-      
-      // Check if file exists
-      await fs.access(ejsPath);
-      
-      // Render EJS
-      const html = await ejs.renderFile(ejsPath, {
-        title: 'Phishing Simulation Tool',
-        timestamp: new Date().toISOString()
-      });
-      
-      res.setHeader('Content-Type', 'text/html');
-      res.end(html);
-      
-    } catch (ejsError) {
-      // EJS not available or file missing
-      console.log('EJS not available, sending fallback');
-      sendFallbackHTML(res, ejsFile);
+      ejs = require('ejs');
+      console.log('EJS module loaded successfully');
+    } catch (e) {
+      console.log('EJS module NOT loaded:', e.message);
+      return sendFallback(res, 'EJS module not installed');
     }
+    
+    // Check if test.ejs exists
+    try {
+      await fs.access(testPath);
+      console.log('test.ejs exists at:', testPath);
+    } catch (e) {
+      console.log('test.ejs NOT found:', testPath);
+      return sendFallback(res, 'test.ejs not found');
+    }
+    
+    // Render the EJS file
+    const html = await ejs.renderFile(testPath, {
+      title: 'Test Page',
+      timestamp: new Date().toISOString()
+    });
+    
+    res.setHeader('Content-Type', 'text/html');
+    res.end(html);
+    console.log('EJS rendered successfully');
     
   } catch (error) {
-    console.error('Render error:', error);
-    sendErrorHTML(res, error);
+    console.error('Full render error:', error);
+    sendFallback(res, error.message);
   }
 };
 
-function sendFallbackHTML(res, ejsFile) {
+function sendFallback(res, reason) {
   const html = `
     <!DOCTYPE html>
     <html>
-    <head>
-      <title>Phishing Simulation Tool</title>
-      <style>
-        body { font-family: Arial, sans-serif; padding: 40px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 { color: #333; }
-      </style>
-    </head>
     <body>
-      <div class="container">
-        <h1>Phishing Simulation Tool</h1>
-        <p>Page: ${ejsFile}</p>
-        <p>EJS rendering is being set up. This is a temporary view.</p>
-        <p><a href="/api">View API</a> | <a href="/">Home</a></p>
-        <p>Timestamp: ${new Date().toISOString()}</p>
-      </div>
+      <h1>Temporary View</h1>
+      <p>Reason: ${reason}</p>
+      <p>EJS is not working yet. Check package.json for "ejs" dependency.</p>
+      <p><a href="/api">Check API</a> | <a href="/">Refresh</a></p>
     </body>
     </html>
   `;
-  
-  res.setHeader('Content-Type', 'text/html');
   res.end(html);
-}
-
-function sendErrorHTML(res, error) {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <h1>Server Error</h1>
-      <p>${error.message}</p>
-      <p><a href="/">Back to home</a> | <a href="/api">API Status</a></p>
-    </body>
-    </html>
-  `;
-  res.status(500).end(html);
 }
