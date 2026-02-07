@@ -1,60 +1,94 @@
-// api/render.js - FINAL VERSION (uses your real EJS)
+// api/render.js - ROBUST VERSION
 const path = require('path');
 const ejs = require('ejs');
 const fs = require('fs').promises;
 
 module.exports = async (req, res) => {
+  console.log('Request for:', req.url);
+  
   try {
-    console.log('Rendering:', req.url);
-    
-    // Map URLs to your EJS files
+    // Determine which page to show
     let ejsFile = 'index.ejs';
     
-    // Add your page routes here
     if (req.url === '/login' || req.url === '/login/') {
       ejsFile = 'login.ejs';
     }
-    // Add more: '/dashboard' -> 'dashboard.ejs', etc.
     
-    const ejsPath = path.join(__dirname, '../views', ejsFile);
+    // Try multiple possible paths
+    const possiblePaths = [
+      path.join(__dirname, '../views', ejsFile),
+      path.join(process.cwd(), 'views', ejsFile),
+      path.join('/var/task/views', ejsFile)
+    ];
     
-    // Check if file exists, fallback to index
-    try {
-      await fs.access(ejsPath);
-    } catch {
-      ejsFile = 'index.ejs';
+    let ejsPath;
+    let fileExists = false;
+    
+    // Check which path works
+    for (const tryPath of possiblePaths) {
+      try {
+        await fs.access(tryPath);
+        ejsPath = tryPath;
+        fileExists = true;
+        console.log('Found EJS at:', tryPath);
+        break;
+      } catch {
+        continue;
+      }
     }
     
-    // Render with your actual data
-    const html = await ejs.renderFile(
-      path.join(__dirname, '../views', ejsFile),
-      {
-        title: 'Phishing Simulation Tool',
-        page: ejsFile.replace('.ejs', ''),
-        timestamp: new Date().toISOString(),
-        // Add your dynamic data here
-        user: null, // Example: Add user data when logged in
-        simulations: [] // Example: Add simulation data
-      }
-    );
+    if (!fileExists) {
+      console.log('EJS file not found, showing fallback');
+      return showFallback(res, `File ${ejsFile} not found in views/ folder`);
+    }
+    
+    // Render the EJS file
+    const html = await ejs.renderFile(ejsPath, {
+      title: 'Phishing Simulation Tool',
+      page: ejsFile.replace('.ejs', ''),
+      timestamp: new Date().toISOString()
+    });
     
     res.setHeader('Content-Type', 'text/html');
     res.end(html);
     
   } catch (error) {
     console.error('Render error:', error);
-    
-    // Fallback to simple error page
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <body>
-        <h1>Error Loading Page</h1>
-        <p>${error.message}</p>
-        <p><a href="/">Home</a> | <a href="/api">API Status</a></p>
-      </body>
-      </html>
-    `;
-    res.status(500).end(html);
+    showFallback(res, error.message);
   }
 };
+
+function showFallback(res, errorMessage) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Phishing Simulation Tool</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 40px; }
+        .error { color: #d00; background: #fee; padding: 15px; border-radius: 5px; }
+        .links { margin-top: 20px; }
+        a { margin-right: 15px; color: #0066cc; }
+      </style>
+    </head>
+    <body>
+      <h1>Phishing Simulation Tool</h1>
+      <div class="error">
+        <strong>Setup Notice:</strong> ${errorMessage}
+      </div>
+      <p>Your EJS files need to be in the <code>views/</code> folder.</p>
+      
+      <div class="links">
+        <a href="/api">Check API Status</a>
+        <a href="/test">Test EJS Page</a>
+        <a href="https://github.com/Bd-Mutant7/Phishing-Simulation-Tool">GitHub Repo</a>
+      </div>
+      
+      <p>Timestamp: ${new Date().toISOString()}</p>
+    </body>
+    </html>
+  `;
+  
+  res.setHeader('Content-Type', 'text/html');
+  res.end(html);
+}
