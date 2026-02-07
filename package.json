@@ -2,7 +2,8 @@
   "name": "phishing-simulation-tool",
   "version": "1.0.0",
   "dependencies": {
-    "@vercel/node": "^4.0.0"
+    "@vercel/node": "^4.0.0",
+    "ejs": "^3.1.10"
   },
   "engines": {
     "node": "24.x"
