@@ -1,60 +1,60 @@
-// api/render.js - TEST EJS VERSION
+// api/render.js - FINAL VERSION (uses your real EJS)
 const path = require('path');
+const ejs = require('ejs');
 const fs = require('fs').promises;
 
 module.exports = async (req, res) => {
-  console.log('Rendering page for:', req.url);
-  
   try {
-    // FIRST: Try to render test.ejs to verify EJS works
-    const testPath = path.join(__dirname, '../views/test.ejs');
+    console.log('Rendering:', req.url);
     
-    // Check if EJS module is available
-    let ejs;
+    // Map URLs to your EJS files
+    let ejsFile = 'index.ejs';
+    
+    // Add your page routes here
+    if (req.url === '/login' || req.url === '/login/') {
+      ejsFile = 'login.ejs';
+    }
+    // Add more: '/dashboard' -> 'dashboard.ejs', etc.
+    
+    const ejsPath = path.join(__dirname, '../views', ejsFile);
+    
+    // Check if file exists, fallback to index
     try {
-      ejs = require('ejs');
-      console.log('EJS module loaded successfully');
-    } catch (e) {
-      console.log('EJS module NOT loaded:', e.message);
-      return sendFallback(res, 'EJS module not installed');
+      await fs.access(ejsPath);
+    } catch {
+      ejsFile = 'index.ejs';
     }
     
-    // Check if test.ejs exists
-    try {
-      await fs.access(testPath);
-      console.log('test.ejs exists at:', testPath);
-    } catch (e) {
-      console.log('test.ejs NOT found:', testPath);
-      return sendFallback(res, 'test.ejs not found');
-    }
-    
-    // Render the EJS file
-    const html = await ejs.renderFile(testPath, {
-      title: 'Test Page',
-      timestamp: new Date().toISOString()
-    });
+    // Render with your actual data
+    const html = await ejs.renderFile(
+      path.join(__dirname, '../views', ejsFile),
+      {
+        title: 'Phishing Simulation Tool',
+        page: ejsFile.replace('.ejs', ''),
+        timestamp: new Date().toISOString(),
+        // Add your dynamic data here
+        user: null, // Example: Add user data when logged in
+        simulations: [] // Example: Add simulation data
+      }
+    );
     
     res.setHeader('Content-Type', 'text/html');
     res.end(html);
-    console.log('EJS rendered successfully');
     
   } catch (error) {
-    console.error('Full render error:', error);
-    sendFallback(res, error.message);
+    console.error('Render error:', error);
+    
+    // Fallback to simple error page
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <body>
+        <h1>Error Loading Page</h1>
+        <p>${error.message}</p>
+        <p><a href="/">Home</a> | <a href="/api">API Status</a></p>
+      </body>
+      </html>
+    `;
+    res.status(500).end(html);
   }
 };
-
-function sendFallback(res, reason) {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <h1>Temporary View</h1>
-      <p>Reason: ${reason}</p>
-      <p>EJS is not working yet. Check package.json for "ejs" dependency.</p>
-      <p><a href="/api">Check API</a> | <a href="/">Refresh</a></p>
-    </body>
-    </html>
-  `;
-  res.end(html);
-}
