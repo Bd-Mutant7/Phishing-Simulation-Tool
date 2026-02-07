@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "views/**/*.ejs",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/",
+      "dest": "/views/index.ejs",
+      "headers": {
+        "Content-Type": "text/html"
+      }
+    },
+    {
+      "src": "/(.*)\\.ejs",
+      "dest": "/views/$1.ejs",
+      "headers": {
+        "Content-Type": "text/html"
+      }
+    }
+  ]
+}
