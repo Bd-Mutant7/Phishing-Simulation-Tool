@@ -1,47 +1,43 @@
-// api/render.js - Handles EJS rendering
+// api/render.js - Renders EJS files
 const path = require('path');
-const ejs = require('ejs');
 const fs = require('fs').promises;
 
 module.exports = async (req, res) => {
   try {
-    // Determine which EJS file to render
-    let ejsFile = 'index.ejs';
+    // Default to index.ejs
+    let filePath = 'index.ejs';
     
+    // Map URLs to EJS files
     if (req.url === '/login' || req.url === '/login/') {
-      ejsFile = 'login.ejs';
+      filePath = 'login.ejs';
     }
+    // Add more mappings as needed
     
-    // Path to EJS file
-    const ejsPath = path.join(__dirname, '../views', ejsFile);
+    const fullPath = path.join(__dirname, '../views', filePath);
     
     // Check if file exists
     try {
-      await fs.access(ejsPath);
+      await fs.access(fullPath);
     } catch {
-      ejsFile = 'index.ejs'; // Fallback to index
+      // Fallback to index if file doesn't exist
+      filePath = 'index.ejs';
     }
     
-    // Render EJS
-    const html = await ejs.renderFile(ejsPath, {
-      title: 'Phishing Simulation Tool',
-      page: ejsFile.replace('.ejs', ''),
-      timestamp: new Date().toISOString()
-    });
+    // Read and send the EJS file
+    const content = await fs.readFile(
+      path.join(__dirname, '../views', filePath), 
+      'utf8'
+    );
     
     res.setHeader('Content-Type', 'text/html');
-    res.end(html);
+    res.end(content);
     
   } catch (error) {
-    console.error('EJS Render Error:', error);
+    console.error('Render error:', error);
     res.status(500).send(`
-      <html>
-        <body>
-          <h1>Server Error</h1>
-          <p>${error.message}</p>
-          <p>Check Vercel logs for details.</p>
-        </body>
-      </html>
+      <h1>Server Error</h1>
+      <p>${error.message}</p>
+      <p><a href="/">Back to home</a></p>
     `);
   }
 };
