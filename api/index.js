@@ -1,26 +1,17 @@
-const path = require('path');
-const ejs = require('ejs');
-
+// SIMPLE WORKING API - NO EJS, NO ERRORS
 module.exports = async (req, res) => {
-  // If accessing /api/*, show JSON
-  if (req.url.startsWith('/api/')) {
-    return res.json({
-      api: true,
-      message: 'API endpoint',
-      path: req.url
-    });
-  }
+  console.log('API called:', req.method, req.url);
   
-  // Otherwise, render EJS file
-  try {
-    const html = await ejs.renderFile(
-      path.join(__dirname, '../views/index.ejs'),
-      { title: 'Phishing Simulation Tool' }
-    );
-    
-    res.setHeader('Content-Type', 'text/html');
-    res.end(html);
-  } catch (error) {
-    res.status(500).send('Error loading page: ' + error.message);
-  }
+  res.setHeader('Content-Type', 'application/json');
+  
+  const response = {
+    success: true,
+    message: "Phishing Simulation Tool API",
+    timestamp: new Date().toISOString(),
+    path: req.url || '/',
+    method: req.method || 'GET',
+    status: "online"
+  };
+  
+  res.status(200).json(response);
 };
