@@ -1,50 +1,12 @@
-// api/index.js
-module.exports = (req, res) => {
-  // Get the path from the request
-  const path = req.url || '/';
+// ULTRA-SIMPLE WORKING VERSION
+module.exports = async (req, res) => {
+  console.log('API called at:', new Date().toISOString());
   
-  // Remove query parameters if any
-  const cleanPath = path.split('?')[0];
-  
-  // Simple routing
-  if (cleanPath === '/' || cleanPath === '') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    return res.end('✅ HOME PAGE - Working!');
-  }
-  
-  if (cleanPath === '/test') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    return res.end('✅ TEST PAGE - Working!');
-  }
-  
-  if (cleanPath === '/analytics') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    return res.end('✅ ANALYTICS PAGE - Working!');
-  }
-  
-  if (cleanPath === '/training') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    return res.end('✅ TRAINING PAGE - Working!');
-  }
-  
-  if (cleanPath === '/report') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    return res.end('✅ REPORT PAGE - Working!');
-  }
-  
-  if (cleanPath === '/user-settings') {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    return res.end('✅ USER SETTINGS PAGE - Working!');
-  }
-  
-  // Not found
-  res.statusCode = 404;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('❌ Page not found: ' + cleanPath);
+  return res.status(200).json({
+    success: true,
+    message: "Phishing Simulation Tool API - Node.js 24",
+    timestamp: new Date().toISOString(),
+    nodeVersion: process.version,
+    path: req.url || '/'
+  });
 };
