@@ -5,6 +5,6 @@
     "@vercel/node": "^4.0.0"
   },
   "engines": {
-    "node": "18.x"
+    "node": "24.x"   // THIS IS THE FIX
   }
 }
